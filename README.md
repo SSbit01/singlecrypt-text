@@ -143,7 +143,7 @@ export async function decryptMessageId(value: string) {
 }
 ```
 
-And now you can easily encrypt and decrypt session IDs:
+And now you can easily encrypt and decrypt messages:
 
 ```typescript
 // ...
