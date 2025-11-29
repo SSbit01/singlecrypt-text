@@ -11,9 +11,19 @@ AES-GCM is extremely fast on modern CPUs, which have dedicated hardware accelera
 
 ## Installation
 
-Using `bun`:
+Use your preferred package manager.
 
 ```shell
+# npm
+npm i singlecrypt-text
+
+# Yarn
+yarn add singlecrypt-text
+
+# pnpm
+pnpm add singlecrypt-text
+
+# Bun
 bun add singlecrypt-text
 ```
 
@@ -32,11 +42,12 @@ A `TypeError` may be thrown if there are problems with the string key.
 
 ### `encryptSymmetricallyText`
 
-Encrypts a value with a symmetric `CryptoKey` previously generated. It takes three parameters:
+Encrypts a value with a symmetric `CryptoKey` previously generated. It takes four parameters:
 
 1. A string value to be encrypted.
 2. The symmetric key generated with `createSymmetricKeyWithText`.
 3. A `TextEncoder` instance, if you want to reuse it (optional).
+4. A boolean `urlSafe` that indicates if the `base64url` alphabet should be used instead of `base64`. It defaults to `false`.
 
 Returns a `Promise<string>` containing the encrypted value.
 
@@ -49,6 +60,7 @@ Decrypts a value with a symmetric `CryptoKey` previously generated. It takes thr
 1. A string value to be decrypted.
 2. The symmetric key generated with `createSymmetricKeyWithText`.
 3. A `TextDecoder` instance, if you want to reuse it (optional).
+4. A boolean `urlSafe` that indicates if the `base64url` alphabet should be used instead of `base64`. It defaults to `false`.
 
 Returns a `Promise<string>` containing the decrypted value.
 
