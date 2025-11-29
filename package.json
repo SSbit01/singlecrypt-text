@@ -1,6 +1,6 @@
 {
   "name": "singlecrypt-text",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": "Stefan Samson <ss42701@outlook.com> (https://ssbit01.github.io/)",
   "repository": "github:SSbit01/singlecrypt-text",
   "main": "index.js",
