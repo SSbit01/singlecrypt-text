@@ -72,9 +72,9 @@ The following errors may be thrown:
 
 ## Example
 
-Let's say you have a session ID in a server and you want the server to encrypt and store the ID in a cookie.
+This is a simple demonstration; production uses should utilize key rotation, among many other security measures.
 
-`./lib/session/crypto.ts`
+`./lib/crypto/message.ts`
 
 ```typescript
 import {
@@ -83,25 +83,25 @@ import {
   decryptSymmetricallyText
 } from "singlecrypt-text";
 
-import { getSessionEncryptionKey } from "./lib/crypto/session";
+import { getMessageEncryptionKey } from "./lib/crypto/key";
 
 
-const sessionCryptoKey = await createSymmetricKeyWithText(
-  await getSessionEncryptionKey()
+const messageCryptoKey = await createSymmetricKeyWithText(
+  await getMessageEncryptionKey()
 );
 
 
-export async function encryptSessionId(value: string) {
+export async function encryptMessageId(value: string) {
   return await encryptSymmetricallyText(
     value,
-    sessionCryptoKey
+    messageCryptoKey
   );
 }
 
-export async function decryptSessionId(value: string) {
+export async function decryptMessageId(value: string) {
   return await decryptSymmetricallyText(
     value,
-    sessionCryptoKey
+    messageCryptoKey
   );
 }
 ```
@@ -115,30 +115,29 @@ import {
   decryptSymmetricallyText
 } from "singlecrypt-text";
 
-import { getSessionEncryptionKey } from "./lib/crypto/session";
+import { getMessageEncryptionKey } from "./lib/crypto/key";
 
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
-const sessionCryptoKey = await createSymmetricKeyWithText(
-  await getSessionEncryptionKey(),
-  textEncoder
+const messageCryptoKey = await createSymmetricKeyWithText(
+  await getMessageEncryptionKey()
 );
 
 
-export async function encryptSessionId(value: string) {
+export async function encryptMessageId(value: string) {
   return await encryptSymmetricallyText(
     value,
-    sessionCryptoKey,
+    messageCryptoKey,
     textEncoder
   );
 }
 
-export async function decryptSessionId(value: string) {
+export async function decryptMessageId(value: string) {
   return await decryptSymmetricallyText(
     value,
-    sessionCryptoKey,
+    messageCryptoKey,
     textDecoder
   );
 }
@@ -148,15 +147,15 @@ And now you can easily encrypt and decrypt session IDs:
 
 ```typescript
 // ...
-import { encryptSessionId, decryptSessionId } from "./lib/session/crypto";
+import { encryptMessageId, decryptMessageId } from "./lib/crypto/message.ts";
 // ...
 
-const sessionId = await getSessionIdFromDatabase();
-const encryptedId = await encryptSessionId(sessionId);  // Now you can safely store it in an HttpOnly cookie
+const message = await getMessage();
+const encryptedMessage = await encryptMessageId(message);  // Now you can safely store it in an HttpOnly cookie
 // ...
-const decryptedId = await decryptSessionId(encryptedId);
+const decryptedMessage = await decryptMessageId(encryptedMessage);
 // ...
-console.log(sessionId === decryptedId);  // True
+console.log(message === decryptedMessage);  // True
 // ...
 ```
 
