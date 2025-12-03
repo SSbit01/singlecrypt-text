@@ -53,7 +53,7 @@ export async function createSymmetricKeyWithText(
  * - The provided key is not valid.
  * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
  */
-export async function encryptSymmetricallyText(
+export async function encryptTextSymmetrically(
   value,
   key,
   textEncoder = new TextEncoder(),
@@ -92,7 +92,7 @@ export async function encryptSymmetricallyText(
  * - The provided key is not valid.
  * - The operation failed.
  */
-export async function decryptSymmetricallyText(
+export async function decryptTextSymmetrically(
   value,
   key,
   textDecoder = new TextDecoder(),

@@ -20,7 +20,7 @@ export function createSymmetricKeyWithText(data: string, textEncoder?: TextEncod
  * - The provided key is not valid.
  * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
  */
-export function encryptSymmetricallyText(value: string, key: CryptoKey, textEncoder?: TextEncoder, urlSafe?: boolean): Promise<string>;
+export function encryptTextSymmetrically(value: string, key: CryptoKey, textEncoder?: TextEncoder, urlSafe?: boolean): Promise<string>;
 /**
  * Decrypts a value with a `CryptoKey` previously generated with `createSymmetricKeyWithText`.
  *
@@ -35,4 +35,4 @@ export function encryptSymmetricallyText(value: string, key: CryptoKey, textEnco
  * - The provided key is not valid.
  * - The operation failed.
  */
-export function decryptSymmetricallyText(value: string, key: CryptoKey, textDecoder?: TextDecoder, urlSafe?: boolean): Promise<string>;
+export function decryptTextSymmetrically(value: string, key: CryptoKey, textDecoder?: TextDecoder, urlSafe?: boolean): Promise<string>;

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { createSymmetricKeyWithText, encryptSymmetricallyText, decryptSymmetricallyText } from "."
+import { createSymmetricKeyWithText, encryptTextSymmetrically, decryptTextSymmetrically } from "."
 
 
 function randomString(length = 32) {
@@ -16,15 +16,15 @@ test("Generate a random symmetric CryptoKey", async() => {
 
 test("Encrypt a random value", async() => {
   const key = await createSymmetricKeyWithText(randomString())
-  expect(await encryptSymmetricallyText(randomString(), key)).toBeString()
+  expect(await encryptTextSymmetrically(randomString(), key)).toBeString()
 })
 
 
 test("Decrypt a random value", async() => {
   const symCryptoKey = await createSymmetricKeyWithText(randomString())
   const randomValue = randomString()
-  const encrypted = await encryptSymmetricallyText(randomValue, symCryptoKey)
-  const decrypted = await decryptSymmetricallyText(encrypted, symCryptoKey)
+  const encrypted = await encryptTextSymmetrically(randomValue, symCryptoKey)
+  const decrypted = await decryptTextSymmetrically(encrypted, symCryptoKey)
   expect(randomValue === decrypted).toBeTrue()
 })
 
@@ -34,8 +34,8 @@ test("Decrypt a random value with two different CryptoKey objects", async() => {
   const symCryptoKey = await createSymmetricKeyWithText(randomKeyString)
   const symCryptoKey2 = await createSymmetricKeyWithText(randomKeyString)
   const randomValue = randomString()
-  const encrypted = await encryptSymmetricallyText(randomValue, symCryptoKey)
-  const decrypted = await decryptSymmetricallyText(encrypted, symCryptoKey2)
+  const encrypted = await encryptTextSymmetrically(randomValue, symCryptoKey)
+  const decrypted = await decryptTextSymmetrically(encrypted, symCryptoKey2)
   expect(randomValue === decrypted).toBeTrue()
 })
 
@@ -43,6 +43,6 @@ test("Check if encrypting and decrypting with different CryptoKey objects return
   const symCryptoKey = await createSymmetricKeyWithText(randomString())
   const symCryptoKey2 = await createSymmetricKeyWithText(randomString())
   const randomValue = randomString()
-  const encrypted = await encryptSymmetricallyText(randomValue, symCryptoKey)
-  expect(async() => await decryptSymmetricallyText(encrypted, symCryptoKey2)).toThrowError()
+  const encrypted = await encryptTextSymmetrically(randomValue, symCryptoKey)
+  expect(async() => await decryptTextSymmetrically(encrypted, symCryptoKey2)).toThrowError()
 })

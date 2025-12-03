@@ -40,7 +40,7 @@ Returns a `Promise<CryptoKey>` containing a SHA-256 hash used to encrypt and dec
 
 A `TypeError` may be thrown if there are problems with the string key.
 
-### `encryptSymmetricallyText`
+### `encryptTextSymmetrically`
 
 Encrypts a value with a symmetric `CryptoKey` previously generated. It takes four parameters:
 
@@ -53,7 +53,7 @@ Returns a `Promise<string>` containing the encrypted value.
 
 A `DOMException` may be thrown if the key is invalid or if the operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
 
-### `decryptSymmetricallyText`
+### `decryptTextSymmetrically`
 
 Decrypts a value with a symmetric `CryptoKey` previously generated. It takes three parameters:
 
@@ -79,8 +79,8 @@ This is a simple demonstration; production uses should utilize key rotation, amo
 ```typescript
 import {
   createSymmetricKeyWithText,
-  encryptSymmetricallyText,
-  decryptSymmetricallyText
+  encryptTextSymmetrically,
+  decryptTextSymmetrically
 } from "singlecrypt-text";
 
 import { getMessageEncryptionKey } from "./lib/crypto/key";
@@ -92,14 +92,14 @@ const messageCryptoKey = await createSymmetricKeyWithText(
 
 
 export async function encryptMessageId(value: string) {
-  return await encryptSymmetricallyText(
+  return await encryptTextSymmetrically(
     value,
     messageCryptoKey
   );
 }
 
 export async function decryptMessageId(value: string) {
-  return await decryptSymmetricallyText(
+  return await decryptTextSymmetrically(
     value,
     messageCryptoKey
   );
@@ -111,8 +111,8 @@ Or you can reuse `TextEncoder` and `TextDecoder` instances for slightly better p
 ```typescript
 import {
   createSymmetricKeyWithText,
-  encryptSymmetricallyText,
-  decryptSymmetricallyText
+  encryptTextSymmetrically,
+  decryptTextSymmetrically
 } from "singlecrypt-text";
 
 import { getMessageEncryptionKey } from "./lib/crypto/key";
@@ -127,7 +127,7 @@ const messageCryptoKey = await createSymmetricKeyWithText(
 
 
 export async function encryptMessageId(value: string) {
-  return await encryptSymmetricallyText(
+  return await encryptTextSymmetrically(
     value,
     messageCryptoKey,
     textEncoder
@@ -135,7 +135,7 @@ export async function encryptMessageId(value: string) {
 }
 
 export async function decryptMessageId(value: string) {
-  return await decryptSymmetricallyText(
+  return await decryptTextSymmetrically(
     value,
     messageCryptoKey,
     textDecoder
