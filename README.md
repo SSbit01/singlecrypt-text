@@ -27,58 +27,50 @@ pnpm add singlecrypt-text
 bun add singlecrypt-text
 ```
 
-## Methods
+## Examples
 
-### `createSymmetricKeyWithText`
+This is a simple demonstration; production uses should utilize **key rotation**, among many other security measures.
 
-Creates a symmetric `CryptoKey` object to be used in the following methods. This method also converts your value key to a SHA-256 hash. It takes two parameters:
+There are two ways to use this library: [object-oriented](#object-oriented) (recommended) or [functional-oriented](#functional-oriented).
 
-1. A string key to be hashed. A 32-byte random string is recommended.
-2. A `TextEncoder` instance, if you want to reuse it (optional).
+### Object-oriented
 
-Returns a `Promise<CryptoKey>` containing a SHA-256 hash used to encrypt and decrypt strings.
+`./lib/crypto/message.ts`
 
-A `TypeError` may be thrown if there are problems with the string key.
+```typescript
+import SingleCryptText from "singlecrypt-text";
 
-### `encryptTextSymmetrically`
+import { getMessageEncryptionKey } from "./lib/crypto/key";
 
-Encrypts a value with a symmetric `CryptoKey` previously generated. It takes four parameters:
 
-1. A string value to be encrypted.
-2. The symmetric key generated with `createSymmetricKeyWithText`.
-3. A `TextEncoder` instance, if you want to reuse it (optional).
-4. A boolean `urlSafe` that indicates if the `base64url` alphabet should be used instead of `base64`. It defaults to `false`.
+export const cryptoMessage = new SingleCryptText(await getMessageEncryptionKey())
+```
 
-Returns a `Promise<string>` containing the encrypted value.
+#### Usage
 
-A `DOMException` may be thrown if the key is invalid or if the operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
+And now you can easily encrypt and decrypt messages:
 
-### `decryptTextSymmetrically`
+```typescript
+// ...
+import { cryptoMessage } from "./lib/crypto/message.ts";
+// ...
 
-Decrypts a value with a symmetric `CryptoKey` previously generated. It takes three parameters:
+const message = await getMessage();
+const encryptedMessage = await cryptoMessage.encrypt(message);  // Now you can safely store it in an HttpOnly cookie
+// ...
+const decryptedMessage = await cryptoMessage.decrypt(encryptedMessage);
+// ...
+console.log(message === decryptedMessage);  // True
+// ...
+```
 
-1. A string value to be decrypted.
-2. The symmetric key generated with `createSymmetricKeyWithText`.
-3. A `TextDecoder` instance, if you want to reuse it (optional).
-4. A boolean `urlSafe` that indicates if the `base64url` alphabet should be used instead of `base64`. It defaults to `false`.
-
-Returns a `Promise<string>` containing the decrypted value.
-
-The following errors may be thrown:
-
-- `TypeError`: if the first parameter is not a string.
-- `SyntaxError`: if the first parameter contains characters outside the Base64 alphabet.
-- `DOMException`: if the key is invalid or if the operation failed.
-
-## Example
-
-This is a simple demonstration; production uses should utilize key rotation, among many other security measures.
+### Functional-oriented
 
 `./lib/crypto/message.ts`
 
 ```typescript
 import {
-  createSymmetricKeyWithText,
+  createSymmetricKeyFromText,
   encryptTextSymmetrically,
   decryptTextSymmetrically
 } from "singlecrypt-text";
@@ -86,19 +78,19 @@ import {
 import { getMessageEncryptionKey } from "./lib/crypto/key";
 
 
-const messageCryptoKey = await createSymmetricKeyWithText(
+const messageCryptoKey = await createSymmetricKeyFromText(
   await getMessageEncryptionKey()
 );
 
 
-export async function encryptMessageId(value: string) {
+export async function encryptMessage(value: string) {
   return await encryptTextSymmetrically(
     value,
     messageCryptoKey
   );
 }
 
-export async function decryptMessageId(value: string) {
+export async function decryptMessage(value: string) {
   return await decryptTextSymmetrically(
     value,
     messageCryptoKey
@@ -110,7 +102,7 @@ Or you can reuse `TextEncoder` and `TextDecoder` instances for slightly better p
 
 ```typescript
 import {
-  createSymmetricKeyWithText,
+  createSymmetricKeyFromText,
   encryptTextSymmetrically,
   decryptTextSymmetrically
 } from "singlecrypt-text";
@@ -121,12 +113,12 @@ import { getMessageEncryptionKey } from "./lib/crypto/key";
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 
-const messageCryptoKey = await createSymmetricKeyWithText(
+const messageCryptoKey = await createSymmetricKeyFromText(
   await getMessageEncryptionKey()
 );
 
 
-export async function encryptMessageId(value: string) {
+export async function encryptMessage(value: string) {
   return await encryptTextSymmetrically(
     value,
     messageCryptoKey,
@@ -134,7 +126,7 @@ export async function encryptMessageId(value: string) {
   );
 }
 
-export async function decryptMessageId(value: string) {
+export async function decryptMessage(value: string) {
   return await decryptTextSymmetrically(
     value,
     messageCryptoKey,
@@ -143,21 +135,143 @@ export async function decryptMessageId(value: string) {
 }
 ```
 
+#### Usage
+
 And now you can easily encrypt and decrypt messages:
 
 ```typescript
 // ...
-import { encryptMessageId, decryptMessageId } from "./lib/crypto/message.ts";
+import { encryptMessage, decryptMessage } from "./lib/crypto/message.ts";
 // ...
 
 const message = await getMessage();
-const encryptedMessage = await encryptMessageId(message);  // Now you can safely store it in an HttpOnly cookie
+const encryptedMessage = await encryptMessage(message);  // Now you can safely store it in an HttpOnly cookie
 // ...
-const decryptedMessage = await decryptMessageId(encryptedMessage);
+const decryptedMessage = await decryptMessage(encryptedMessage);
 // ...
 console.log(message === decryptedMessage);  // True
 // ...
 ```
+
+## Reference
+
+### Object-oriented API: `SingleCryptText`
+
+A class that simplifies symmetric encryption and decryption using a shared key derived from a text string.
+
+It is also the default export.
+
+```ts
+new SingleCryptText(
+  text: string,
+  urlSafe: boolean = true,
+  extractable: boolean = false,
+  textEncoder?: TextEncoder,
+  textDecoder?: TextDecoder
+)
+```
+- `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
+- `urlSafe` (optional): Use `base64url` encoding (`true`, default) or regular `base64` (`false`).
+- `extractable` (optional): Whether the generated cryptographic key is extractable. Defaults to `false`.
+- `textEncoder`/`textDecoder` (optional): Optionally reuse your own encoder/decoder instances.
+
+#### Instance methods
+
+- `async encrypt(text: string): Promise<string>`
+  
+  Encrypt a string using the instance's key.
+
+- `async decrypt(encryptedText: string): Promise<string>`
+  
+  Decrypt a string previously encrypted by this or any compatible instance.
+
+- `async getKey(): Promise<CryptoKey>`
+  
+  Returns the underlying `CryptoKey` instance.
+
+#### Instance properties
+
+- `urlSafe: boolean`  
+  Indicates if the instance uses `base64url` encoding (`true`, default) or standard `base64` (`false`) for encrypted outputs.
+
+
+#### Example
+
+```ts
+import SingleCryptText from "singlecrypt-text";
+
+const crypt = new SingleCryptText("my secret passphrase");
+
+const encrypted = await crypt.encrypt("Sensitive message!");
+const decrypted = await crypt.decrypt(encrypted);
+
+console.log(decrypted); // "Sensitive message!"
+```
+
+---
+
+
+### Functional-oriented API
+
+Functional exports for direct cryptographic operations.
+
+```ts
+createSymmetricKeyFromText(
+  text: string,
+  extractable?: boolean,
+  textEncoder?: TextEncoder
+): Promise<CryptoKey>
+```
+- `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
+- `extractable` (optional): Whether the generated key is extractable. Defaults to `false`.
+- `textEncoder` (optional): Optionally reuse your own `TextEncoder` instance.
+
+Returns a `Promise<CryptoKey>` containing the derived symmetric key (SHA-256 hash).
+
+**Throws:**  
+- `TypeError` if there are problems with the text key.
+
+---
+
+```ts
+encryptTextSymmetrically(
+  key: CryptoKey,
+  text: string,
+  urlSafe?: boolean,
+  textEncoder?: TextEncoder
+): Promise<string>
+```
+- `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
+- `text`: String value to encrypt.
+- `urlSafe` (optional): Use `base64url` encoding if `true` (default: `true`). If `false`, uses regular `base64`.
+- `textEncoder` (optional): Optionally reuse your own `TextEncoder` instance.
+
+Returns a `Promise<string>` containing the encrypted value as a Base64 string.
+
+**Throws:**  
+- `DOMException` if the key is invalid or if the operation failed (e.g., large payload).
+
+---
+
+```ts
+decryptTextSymmetrically(
+  key: CryptoKey,
+  encryptedText: string,
+  urlSafe?: boolean,
+  textDecoder?: TextDecoder
+): Promise<string>
+```
+- `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
+- `encryptedText`: The string value to decrypt (encrypted with compatible methods/settings).
+- `urlSafe` (optional): If `true` (default), expects `base64url`; if `false`, expects regular `base64`.
+- `textDecoder` (optional): Optionally reuse your own `TextDecoder` instance.
+
+Returns a `Promise<string>` containing the decrypted value.
+
+**Throws:**  
+- `TypeError`: if the second parameter is not a string.
+- `SyntaxError`: if the input contains characters outside the Base64 alphabet.
+- `DOMException`: if the key is invalid or if the operation failed.
 
 ---
 
