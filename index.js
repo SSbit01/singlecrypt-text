@@ -23,7 +23,7 @@ const base64UrlOptions = Object.freeze({
  * @async
  * @function createSymmetricKeyFromText
  * @param   {string}             text          - Text key to be hashed. A 32-byte high entropy string is recommended.
- * @param   {boolean}            [extractable] - Indicates if the key can be extractable.
+ * @param   {boolean}            [extractable] - Whether the generated key is extractable. Defaults to `false`..
  * @param   {TextEncoder}        [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
  * @returns {Promise<CryptoKey>} A `CryptoKey` containing a SHA-256 hash used to encrypt and decrypt strings.
  * @throws  {TypeError}          Thrown if `text` is invalid.
@@ -156,7 +156,7 @@ export class SingleCryptText {
    * 
    * @param   {string}      text          - Text key to be hashed. A 32-byte high entropy string is recommended.
    * @param   {boolean}     [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
-   * @param   {boolean}     [extractable] - Indicates if the key can be extractable.
+   * @param   {boolean}     [extractable] - Whether the generated key is extractable. Defaults to `false`..
    * @param   {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
    * @param   {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
    * @throws  {TypeError}   Thrown if `text` is invalid.

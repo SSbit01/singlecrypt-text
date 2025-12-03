@@ -56,6 +56,7 @@ import { cryptoMessage } from "./lib/crypto/message.ts";
 // ...
 
 const message = await getMessage();
+
 const encryptedMessage = await cryptoMessage.encrypt(message);  // Now you can safely store it in an HttpOnly cookie
 // ...
 const decryptedMessage = await cryptoMessage.decrypt(encryptedMessage);
@@ -145,6 +146,7 @@ import { encryptMessage, decryptMessage } from "./lib/crypto/message.ts";
 // ...
 
 const message = await getMessage();
+
 const encryptedMessage = await encryptMessage(message);  // Now you can safely store it in an HttpOnly cookie
 // ...
 const decryptedMessage = await decryptMessage(encryptedMessage);

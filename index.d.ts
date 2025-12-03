@@ -5,7 +5,7 @@
  * @async
  * @function createSymmetricKeyFromText
  * @param   {string}             text          - Text key to be hashed. A 32-byte high entropy string is recommended.
- * @param   {boolean}            [extractable] - Indicates if the key can be exported.
+ * @param   {boolean}            [extractable] - Whether the generated key is extractable. Defaults to `false`..
  * @param   {TextEncoder}        [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
  * @returns {Promise<CryptoKey>} A `CryptoKey` containing a SHA-256 hash used to encrypt and decrypt strings.
  * @throws  {TypeError}          Thrown if `text` is invalid.
@@ -46,13 +46,13 @@ export function decryptTextSymmetrically(key: CryptoKey, encryptedText: string, 
 /**
  * Class that simplifies the encryption and decryption using the same key.
  */
-export default class SingleCryptText {
+export class SingleCryptText {
     /**
      * Create an instance using a text as a key.
      *
      * @param   {string}      text          - Text key to be hashed. A 32-byte high entropy string is recommended.
      * @param   {boolean}     [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
-     * @param   {boolean}     [extractable] - Indicates if the key can be exported.
+     * @param   {boolean}     [extractable] - Whether the generated key is extractable. Defaults to `false`..
      * @param   {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
      * @param   {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
      * @throws  {TypeError}   Thrown if `text` is invalid.
@@ -76,19 +76,15 @@ export default class SingleCryptText {
      *
      * @async
      * @param   {string}          text          - String value to be encrypted.
-     * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
-     * @param   {TextEncoder}     [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
      * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
      * @throws  {DOMException}    Raised when:
      * - The provided key is not valid.
      * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
      */
-    encrypt(text: string, urlSafe?: boolean, textEncoder?: TextEncoder): Promise<string>;
+    encrypt(text: string): Promise<string>;
     /**
      * @async
      * @param   {string}          encryptedText - Encrypted value to be decrypted.
-     * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
-     * @param   {TextDecoder}     [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
      * @returns {Promise<string>} The value decrypted.
      * @throws  {TypeError}       Thrown if `value` is not a string.
      * @throws  {SyntaxError}     Thrown if `value` contains characters outside Base64 alphabet.
@@ -96,6 +92,7 @@ export default class SingleCryptText {
      * - The provided key is not valid.
      * - The operation failed.
      */
-    decrypt(encryptedText: string, urlSafe?: boolean, textDecoder?: TextDecoder): Promise<string>;
+    decrypt(encryptedText: string): Promise<string>;
     #private;
 }
+export default SingleCryptText;
