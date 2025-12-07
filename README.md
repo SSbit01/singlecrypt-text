@@ -3,7 +3,7 @@
 > [!WARNING]  
 > This package uses [`Uint8Array.prototype.toBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64) and [`Uint8Array.fromBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64), which, as of November 2025, are only supported by the latest versions of browsers, [Bun](https://bun.com/), [Deno 2.5 or later](https://deno.com/) and [Node.js 25 or later](https://nodejs.org/en). See [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility) for compatibility.
 
-A simple, secure, and fast symmetric encryption library that makes use of [AES-GCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) and modern platform features. It leverages the native [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API), so it works both in browsers and JavaScript runtimes.
+A simple, secure, and fast symmetric encryption library that makes use of [AES-GCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) and modern platform features. It leverages the native [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API), so it works both in browsers (in secure contexts) and JavaScript runtimes.
 
 ## Why AES-GCM?
 
@@ -45,7 +45,10 @@ import { getMessageEncryptionKey } from "./lib/crypto/key";
 
 export const cryptoMessage = new SingleCryptText(
   await getMessageEncryptionKey()
-)
+);
+
+// Recommended: Freeze the instance to prevent modification of the `urlSafe` property.
+Object.freeze(cryptoMessage);
 ```
 
 #### Usage
@@ -197,6 +200,9 @@ new SingleCryptText(
 
 - `urlSafe: boolean`  
   Indicates if the instance uses `base64url` encoding (`true`, default) or standard `base64` (`false`) for encrypted outputs.
+  
+  > [!NOTE]  
+  > It is recommended to freeze `SingleCryptText` instances with `Object.freeze()` to prevent its modification.
 
 
 #### Example

@@ -45,7 +45,7 @@ describe("Functional", () => {
     const symCryptoKey2 = await createSymmetricKeyFromText(randomString())
     const randomValue = randomString()
     const encrypted = await encryptTextSymmetrically(symCryptoKey, randomValue)
-    expect(async() => await decryptTextSymmetrically(symCryptoKey2, encrypted)).toThrowError()
+    await expect(decryptTextSymmetrically(symCryptoKey2, encrypted)).rejects.toThrow()
   })
 
   test("Check if disabling `urlSafe` changes the encryption results.", async() => {
@@ -58,8 +58,8 @@ describe("Functional", () => {
     const decryptedUrlUnafe = await decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe, false)
     expect(randomValue).toBe(decryptedUrlSafe)
     expect(randomValue).toBe(decryptedUrlUnafe)
-    expect(async() => await decryptTextSymmetrically(symCryptoKey, encryptedUrlSafe, false)).toThrowError()
-    expect(async() => await decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe, true)).toThrowError()
+    await expect(decryptTextSymmetrically(symCryptoKey, encryptedUrlSafe, false)).rejects.toThrow()
+    await expect(decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe, true)).rejects.toThrow()
   })
 
 })
@@ -69,11 +69,38 @@ describe("Object-oriented", () => {
 
   const singleCryptText1 = new SingleCryptText(randomString())
 
-  test("Decrypt a random value", async() => {
+  test("Encrypt and decrypt random values", async() => {
     const randomValue = randomString()
     const encrypted = await singleCryptText1.encrypt(randomValue)
     const decrypted = await singleCryptText1.decrypt(encrypted)
     expect(randomValue).toBe(decrypted)
+    let randomValue2
+    do {
+      randomValue2 = randomString()
+    } while (randomValue === randomValue2)
+    const encrypted2 = await singleCryptText1.encrypt(randomValue2)
+    expect(encrypted).not.toBe(encrypted2)
+    const decrypted2 = await singleCryptText1.decrypt(encrypted2)
+    expect(decrypted).not.toBe(decrypted2)
+    expect(randomValue2).toBe(decrypted2)
+  })
+
+  test("Check if `urlSafe` property works", async() => {
+    const randomValue = randomString()
+    const encrypted = await singleCryptText1.encrypt(randomValue)
+    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
+    await expect(singleCryptText1.decrypt(encrypted)).rejects.toThrow()
+    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
+    const decrypted = await singleCryptText1.decrypt(encrypted)
+    expect(randomValue).toBe(decrypted)
+    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
+    const encrypted2 = await singleCryptText1.encrypt(randomValue)
+    expect(encrypted).not.toBe(encrypted2)
+    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
+    await expect(singleCryptText1.decrypt(encrypted2)).rejects.toThrow()
+    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
+    const decrypted2 = await singleCryptText1.decrypt(encrypted2)
+    expect(randomValue).toBe(decrypted2)
   })
 
 })

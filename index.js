@@ -199,7 +199,7 @@ export class SingleCryptText {
    * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
    */
   async encrypt(text) {
-    return encryptTextSymmetrically(await this.getKey(), text, this.urlSafe, this.#textEncoder)
+    return await encryptTextSymmetrically(await this.getKey(), text, this.urlSafe, this.#textEncoder)
   }
 
   /**
@@ -213,7 +213,7 @@ export class SingleCryptText {
    * - The operation failed.
    */
   async decrypt(encryptedText) {
-    return decryptTextSymmetrically(await this.getKey(), encryptedText, this.urlSafe, this.#textDecoder)
+    return await decryptTextSymmetrically(await this.getKey(), encryptedText, this.urlSafe, this.#textDecoder)
   }
 
 }

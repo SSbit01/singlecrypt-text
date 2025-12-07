@@ -1,6 +1,6 @@
 {
   "name": "singlecrypt-text",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "author": "Stefan Samson <ss42701@outlook.com> (https://ssbit01.github.io/)",
   "repository": "github:SSbit01/singlecrypt-text",
   "main": "index.js",
@@ -44,6 +44,7 @@
   "private": false,
   "scripts": {
     "test": "bun test",
+    "test:random": "bun test --randomize",
     "build:types": "tsc",
     "build": "bun build ./index.js --minify --target browser --outdir ./dist --entry-naming [dir]/[name].min.[ext]",
     "build:cjs": "bun build ./index.js --minify --format cjs --outdir ./dist --entry-naming [dir]/[name].node.min.[ext]"
