@@ -177,6 +177,7 @@ new SingleCryptText(
   textDecoder?: TextDecoder
 )
 ```
+
 - `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
 - `urlSafe` (optional): Use `base64url` encoding (`true`, default) or regular `base64` (`false`).
 - `extractable` (optional): Whether the generated cryptographic key is extractable. Defaults to `false`.
