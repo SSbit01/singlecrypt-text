@@ -220,7 +220,6 @@ console.log(decrypted); // "Sensitive message!"
 
 ---
 
-
 ### Functional-oriented API
 
 Functional exports for direct cryptographic operations.
