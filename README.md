@@ -271,6 +271,7 @@ decryptTextSymmetrically(
   textDecoder?: TextDecoder
 ): Promise<string>
 ```
+
 - `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
 - `encryptedText`: The string value to decrypt (encrypted with compatible methods/settings).
 - `urlSafe` (optional): If `true` (default), expects `base64url`; if `false`, expects regular `base64`.
