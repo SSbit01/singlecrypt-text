@@ -201,9 +201,8 @@ new SingleCryptText(
 - `urlSafe: boolean`  
   Indicates if the instance uses `base64url` encoding (`true`, default) or standard `base64` (`false`) for encrypted outputs.
   
-  > [!NOTE]  
-  > It is recommended to freeze `SingleCryptText` instances with `Object.freeze()` to prevent its modification.
-
+> [!NOTE]  
+> It is recommended to freeze `SingleCryptText` instances with `Object.freeze()` to prevent their modification.
 
 #### Example
 
