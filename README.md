@@ -35,20 +35,15 @@ There are two ways to use this library: [object-oriented](#object-oriented) (rec
 
 ### Object-oriented
 
-`./lib/crypto/message.ts`
+`./lib/crypto.js`
 
 ```typescript
 import SingleCryptText from "singlecrypt-text";
-
-import { getMessageEncryptionKey } from "./lib/crypto/key";
-
+import { getMessageEncryptionKey } from "./lib/key";
 
 export const cryptoMessage = new SingleCryptText(
   await getMessageEncryptionKey()
 );
-
-// Recommended: Freeze the instance to prevent later mutation.
-Object.freeze(cryptoMessage);
 ```
 
 #### Usage
@@ -57,7 +52,7 @@ And now you can easily encrypt and decrypt messages:
 
 ```typescript
 // ...
-import { cryptoMessage } from "./lib/crypto/message.ts";
+import { cryptoMessage } from "./lib/crypto.js";
 // ...
 
 const message = await getMessage();
@@ -195,9 +190,6 @@ new SingleCryptText(
 - `async getKey(): Promise<CryptoKey>`
   
   Returns the underlying `CryptoKey` instance.
-
-> [!NOTE]  
-> It is recommended to freeze `SingleCryptText` instances with `Object.freeze()` to prevent their modification.
 
 #### Example
 

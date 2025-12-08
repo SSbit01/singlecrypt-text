@@ -73,19 +73,7 @@ export async function encryptTextSymmetrically(
   /**
    * @type {Parameters<Uint8Array["toBase64"]>[0]}
    */
-  let options
-
-  /**
-   * @type {number}
-   */
-  let urlSafeIndicator
-
-  if (urlSafe) {
-    options = base64UrlOptions
-    urlSafeIndicator = 1
-  } else {
-    urlSafeIndicator = 0
-  }
+  const options = urlSafe ? base64UrlOptions : undefined
 
   return (
     iv.toBase64(options) +
@@ -95,11 +83,13 @@ export async function encryptTextSymmetrically(
         key,
         textEncoder.encode(text)
       )
-    ).toBase64(options) +
-    urlSafeIndicator
+    ).toBase64(options)
   )
 
 }
+
+
+const base64UrlRegex = /-|_/
 
 
 /**
@@ -123,20 +113,10 @@ export async function decryptTextSymmetrically(
   textDecoder = new TextDecoder()
 ) {
 
-  const lastIndex = encryptedText.length - 1
-
-  /**
-   * @type {Parameters<Uint8Array["toBase64"]>[0]}
-   */
-  let options
-
-  if (encryptedText[lastIndex] === "1") {
-    options = base64UrlOptions
-  } else if (encryptedText[lastIndex] !== "0") {
-    throw SyntaxError()
-  }
-
-  const data = Uint8Array.fromBase64(encryptedText.substring(0, lastIndex), options)
+  const data = Uint8Array.fromBase64(
+    encryptedText,
+    base64UrlRegex.test(encryptedText) ? base64UrlOptions : undefined
+  )
   
   return (
     textDecoder.decode(
