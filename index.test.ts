@@ -48,18 +48,16 @@ describe("Functional", () => {
     await expect(decryptTextSymmetrically(symCryptoKey2, encrypted)).rejects.toThrow()
   })
 
-  test("Check if disabling `urlSafe` changes the encryption results.", async() => {
+  test("Check if disabling `urlSafe` changes the encryption results", async() => {
     const symCryptoKey = await createSymmetricKeyFromText(randomString())
     const randomValue = randomString()
     const encryptedUrlSafe = await encryptTextSymmetrically(symCryptoKey, randomValue, true)
     const encryptedUrlUnsafe = await encryptTextSymmetrically(symCryptoKey, randomValue, false)
     expect(encryptedUrlSafe).not.toBe(encryptedUrlUnsafe)
-    const decryptedUrlSafe = await decryptTextSymmetrically(symCryptoKey, encryptedUrlSafe, true)
-    const decryptedUrlUnafe = await decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe, false)
+    const decryptedUrlSafe = await decryptTextSymmetrically(symCryptoKey, encryptedUrlSafe)
+    const decryptedUrlUnafe = await decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe)
     expect(randomValue).toBe(decryptedUrlSafe)
     expect(randomValue).toBe(decryptedUrlUnafe)
-    await expect(decryptTextSymmetrically(symCryptoKey, encryptedUrlSafe, false)).rejects.toThrow()
-    await expect(decryptTextSymmetrically(symCryptoKey, encryptedUrlUnsafe, true)).rejects.toThrow()
   })
 
 })
@@ -85,20 +83,13 @@ describe("Object-oriented", () => {
     expect(randomValue2).toBe(decrypted2)
   })
 
-  test("Check if `urlSafe` property works", async() => {
+  test("Check if disabling `urlSafe` changes the encryption results", async() => {
     const randomValue = randomString()
     const encrypted = await singleCryptText1.encrypt(randomValue)
-    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
-    await expect(singleCryptText1.decrypt(encrypted)).rejects.toThrow()
-    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
     const decrypted = await singleCryptText1.decrypt(encrypted)
     expect(randomValue).toBe(decrypted)
-    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
-    const encrypted2 = await singleCryptText1.encrypt(randomValue)
+    const encrypted2 = await singleCryptText1.encrypt(randomValue, false)
     expect(encrypted).not.toBe(encrypted2)
-    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
-    await expect(singleCryptText1.decrypt(encrypted2)).rejects.toThrow()
-    singleCryptText1.urlSafe = !singleCryptText1.urlSafe
     const decrypted2 = await singleCryptText1.decrypt(encrypted2)
     expect(randomValue).toBe(decrypted2)
   })

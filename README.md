@@ -47,7 +47,7 @@ export const cryptoMessage = new SingleCryptText(
   await getMessageEncryptionKey()
 );
 
-// Recommended: Freeze the instance to prevent modification of the `urlSafe` property.
+// Recommended: Freeze the instance to prevent later mutation.
 Object.freeze(cryptoMessage);
 ```
 
@@ -128,6 +128,7 @@ export async function encryptMessage(value: string) {
   return await encryptTextSymmetrically(
     value,
     messageCryptoKey,
+    true,
     textEncoder
   );
 }
@@ -171,7 +172,6 @@ It is also the default export.
 ```ts
 new SingleCryptText(
   text: string,
-  urlSafe: boolean = true,
   extractable: boolean = false,
   textEncoder?: TextEncoder,
   textDecoder?: TextDecoder
@@ -179,15 +179,14 @@ new SingleCryptText(
 ```
 
 - `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
-- `urlSafe` (optional): Use `base64url` encoding (`true`, default) or regular `base64` (`false`).
 - `extractable` (optional): Whether the generated cryptographic key is extractable. Defaults to `false`.
 - `textEncoder`/`textDecoder` (optional): Optionally reuse your own encoder/decoder instances.
 
 #### Instance methods
 
-- `async encrypt(text: string): Promise<string>`
+- `async encrypt(text: string, urlSafe?: boolean): Promise<string>`
   
-  Encrypt a string using the instance's key.
+  Encrypt a string using the instance's key. Optionally specify `urlSafe` (`true` by default) to use `base64url` encoding.
 
 - `async decrypt(encryptedText: string): Promise<string>`
   
@@ -197,11 +196,6 @@ new SingleCryptText(
   
   Returns the underlying `CryptoKey` instance.
 
-#### Instance properties
-
-- `urlSafe: boolean`  
-  Indicates if the instance uses `base64url` encoding (`true`, default) or standard `base64` (`false`) for encrypted outputs.
-  
 > [!NOTE]  
 > It is recommended to freeze `SingleCryptText` instances with `Object.freeze()` to prevent their modification.
 
@@ -266,14 +260,12 @@ Returns a `Promise<string>` containing the encrypted value as a Base64 string.
 decryptTextSymmetrically(
   key: CryptoKey,
   encryptedText: string,
-  urlSafe?: boolean,
   textDecoder?: TextDecoder
 ): Promise<string>
 ```
 
 - `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
 - `encryptedText`: The string value to decrypt (encrypted with compatible methods/settings).
-- `urlSafe` (optional): If `true` (default), expects `base64url`; if `false`, expects regular `base64`.
 - `textDecoder` (optional): Optionally reuse your own `TextDecoder` instance.
 
 Returns a `Promise<string>` containing the decrypted value.

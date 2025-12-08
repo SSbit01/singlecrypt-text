@@ -70,17 +70,33 @@ export async function encryptTextSymmetrically(
 
   const iv = crypto.getRandomValues(new Uint8Array(ivBytesLength))
 
-  const base64Options = urlSafe ? base64UrlOptions : undefined
+  /**
+   * @type {Parameters<Uint8Array["toBase64"]>[0]}
+   */
+  let options
+
+  /**
+   * @type {number}
+   */
+  let urlSafeIndicator
+
+  if (urlSafe) {
+    options = base64UrlOptions
+    urlSafeIndicator = 1
+  } else {
+    urlSafeIndicator = 0
+  }
 
   return (
-    iv.toBase64(base64Options) +
+    iv.toBase64(options) +
     new Uint8Array(
       await crypto.subtle.encrypt(
         { name: encryptionAlgorithm, iv },
         key,
         textEncoder.encode(text)
       )
-    ).toBase64(base64Options)
+    ).toBase64(options) +
+    urlSafeIndicator
   )
 
 }
@@ -93,7 +109,6 @@ export async function encryptTextSymmetrically(
  * @function decryptTextSymmetrically
  * @param   {CryptoKey}       key           - Symmetric key used to encrypt the value.
  * @param   {string}          encryptedText - Encrypted value to be decrypted.
- * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
  * @param   {TextDecoder}     [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
  * @returns {Promise<string>} The value decrypted.
  * @throws  {TypeError}       Thrown if `encryptedText` is not a string.
@@ -105,11 +120,23 @@ export async function encryptTextSymmetrically(
 export async function decryptTextSymmetrically(
   key,
   encryptedText,
-  urlSafe = true,
   textDecoder = new TextDecoder()
 ) {
 
-  const data = Uint8Array.fromBase64(encryptedText, urlSafe ? base64UrlOptions : undefined)
+  const lastIndex = encryptedText.length - 1
+
+  /**
+   * @type {Parameters<Uint8Array["toBase64"]>[0]}
+   */
+  let options
+
+  if (encryptedText[lastIndex] === "1") {
+    options = base64UrlOptions
+  } else if (encryptedText[lastIndex] !== "0") {
+    throw SyntaxError()
+  }
+
+  const data = Uint8Array.fromBase64(encryptedText.substring(0, lastIndex), options)
   
   return (
     textDecoder.decode(
@@ -144,18 +171,9 @@ export class SingleCryptText {
   #textDecoder
 
   /**
-   * The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet.
-   * Enabled by default.
-   * 
-   * @type {boolean}
-   */
-  urlSafe
-
-  /**
    * Create an instance using a text as a key.
    * 
    * @param   {string}      text          - Text key to be hashed. A 32-byte high entropy string is recommended.
-   * @param   {boolean}     [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
    * @param   {boolean}     [extractable] - Whether the generated key is extractable. Defaults to `false`..
    * @param   {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
    * @param   {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
@@ -163,7 +181,6 @@ export class SingleCryptText {
    */
   constructor(
     text,
-    urlSafe = true,
     extractable = false,
     textEncoder = new TextEncoder(),
     textDecoder = new TextDecoder()
@@ -171,7 +188,6 @@ export class SingleCryptText {
     this.#keyPromise = createSymmetricKeyFromText(text, extractable, textEncoder)
     this.#textEncoder = textEncoder
     this.#textDecoder = textDecoder
-    this.urlSafe = urlSafe
   }
 
   /**
@@ -193,13 +209,14 @@ export class SingleCryptText {
    * 
    * @async
    * @param   {string}          text          - String value to be encrypted.
+   * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
    * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
    * @throws  {DOMException}    Raised when:
    * - The provided key is not valid.
    * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
    */
-  async encrypt(text) {
-    return await encryptTextSymmetrically(await this.getKey(), text, this.urlSafe, this.#textEncoder)
+  async encrypt(text, urlSafe = true) {
+    return await encryptTextSymmetrically(await this.getKey(), text, urlSafe, this.#textEncoder)
   }
 
   /**
@@ -213,7 +230,7 @@ export class SingleCryptText {
    * - The operation failed.
    */
   async decrypt(encryptedText) {
-    return await decryptTextSymmetrically(await this.getKey(), encryptedText, this.urlSafe, this.#textDecoder)
+    return await decryptTextSymmetrically(await this.getKey(), encryptedText, this.#textDecoder)
   }
 
 }
