@@ -84,16 +84,16 @@ const messageCryptoKey = await createSymmetricKeyFromText(
 );
 
 
-export async function encryptMessage(value: string) {
+export async function encryptMessage(text: string) {
   return await encryptTextSymmetrically(
-    value,
+    text,
     messageCryptoKey
   );
 }
 
-export async function decryptMessage(value: string) {
+export async function decryptMessage(ciphertext: string) {
   return await decryptTextSymmetrically(
-    value,
+    ciphertext,
     messageCryptoKey
   );
 }
@@ -119,18 +119,18 @@ const messageCryptoKey = await createSymmetricKeyFromText(
 );
 
 
-export async function encryptMessage(value: string) {
+export async function encryptMessage(text: string) {
   return await encryptTextSymmetrically(
-    value,
+    text,
     messageCryptoKey,
     true,
     textEncoder
   );
 }
 
-export async function decryptMessage(value: string) {
+export async function decryptMessage(ciphertext: string) {
   return await decryptTextSymmetrically(
-    value,
+    ciphertext,
     messageCryptoKey,
     textDecoder
   );
@@ -166,14 +166,14 @@ It is also the default export.
 
 ```ts
 new SingleCryptText(
-  text: string,
+  key: string,
   extractable: boolean = false,
   textEncoder?: TextEncoder,
   textDecoder?: TextDecoder
 )
 ```
 
-- `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
+- `key`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
 - `extractable` (optional): Whether the generated cryptographic key is extractable. Defaults to `false`.
 - `textEncoder`/`textDecoder` (optional): Optionally reuse your own encoder/decoder instances.
 
@@ -183,7 +183,7 @@ new SingleCryptText(
   
   Encrypt a string using the instance's key. Optionally specify `urlSafe` (`true` by default) to use `base64url` encoding.
 
-- `async decrypt(encryptedText: string): Promise<string>`
+- `async decrypt(ciphertext: string): Promise<string>`
   
   Decrypt a string previously encrypted by this or any compatible instance.
 
@@ -212,12 +212,12 @@ Functional exports for direct cryptographic operations.
 
 ```ts
 createSymmetricKeyFromText(
-  text: string,
+  key: string,
   extractable?: boolean,
   textEncoder?: TextEncoder
 ): Promise<CryptoKey>
 ```
-- `text`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
+- `key`: The secret string to use as a key (should be high-entropy, such as a 32-byte random string).
 - `extractable` (optional): Whether the generated key is extractable. Defaults to `false`.
 - `textEncoder` (optional): Optionally reuse your own `TextEncoder` instance.
 
@@ -251,13 +251,13 @@ Returns a `Promise<string>` containing the encrypted value as a Base64 string.
 ```ts
 decryptTextSymmetrically(
   key: CryptoKey,
-  encryptedText: string,
+  ciphertext: string,
   textDecoder?: TextDecoder
 ): Promise<string>
 ```
 
 - `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
-- `encryptedText`: The string value to decrypt (encrypted with compatible methods/settings).
+- `ciphertext`: The string value to decrypt (encrypted with compatible methods/settings).
 - `textDecoder` (optional): Optionally reuse your own `TextDecoder` instance.
 
 Returns a `Promise<string>` containing the decrypted value.

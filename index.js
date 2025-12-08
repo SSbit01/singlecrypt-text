@@ -22,14 +22,14 @@ const base64UrlOptions = Object.freeze({
  * 
  * @async
  * @function createSymmetricKeyFromText
- * @param   {string}             text          - Text key to be hashed. A 32-byte high entropy string is recommended.
+ * @param   {string}             key           - Text key to be hashed. A 32-byte high entropy string is recommended.
  * @param   {boolean}            [extractable] - Whether the generated key is extractable. Defaults to `false`..
  * @param   {TextEncoder}        [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
  * @returns {Promise<CryptoKey>} A `CryptoKey` containing a SHA-256 hash used to encrypt and decrypt strings.
  * @throws  {TypeError}          Thrown if `text` is invalid.
  */
 export async function createSymmetricKeyFromText(
-  text,
+  key,
   extractable = false,
   textEncoder = new TextEncoder()
 ) {
@@ -37,7 +37,7 @@ export async function createSymmetricKeyFromText(
   return (
     await crypto.subtle.importKey(
       "raw",
-      await crypto.subtle.digest("SHA-256", textEncoder.encode(text)),
+      await crypto.subtle.digest("SHA-256", textEncoder.encode(key)),
       encryptionAlgorithm,
       extractable,
       keyUsages
@@ -98,24 +98,24 @@ const base64UrlRegex = /-|_/
  * @async
  * @function decryptTextSymmetrically
  * @param   {CryptoKey}       key           - Symmetric key used to encrypt the value.
- * @param   {string}          encryptedText - Encrypted value to be decrypted.
+ * @param   {string}          ciphertext    - Encrypted value to be decrypted.
  * @param   {TextDecoder}     [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
  * @returns {Promise<string>} The value decrypted.
- * @throws  {TypeError}       Thrown if `encryptedText` is not a string.
- * @throws  {SyntaxError}     Thrown if `encryptedText` contains characters outside Base64 alphabet.
+ * @throws  {TypeError}       Thrown if `ciphertext` is not a string.
+ * @throws  {SyntaxError}     Thrown if `ciphertext` contains characters outside Base64 alphabet.
  * @throws  {DOMException}    Raised when:
  * - The provided key is not valid.
  * - The operation failed.
  */
 export async function decryptTextSymmetrically(
   key,
-  encryptedText,
+  ciphertext,
   textDecoder = new TextDecoder()
 ) {
 
   const data = Uint8Array.fromBase64(
-    encryptedText,
-    base64UrlRegex.test(encryptedText) ? base64UrlOptions : undefined
+    ciphertext,
+    base64UrlRegex.test(ciphertext) ? base64UrlOptions : undefined
   )
   
   return (
@@ -153,19 +153,19 @@ export class SingleCryptText {
   /**
    * Create an instance using a text as a key.
    * 
-   * @param   {string}      text          - Text key to be hashed. A 32-byte high entropy string is recommended.
+   * @param   {string}      key           - Text key to be hashed. A 32-byte high entropy string is recommended.
    * @param   {boolean}     [extractable] - Whether the generated key is extractable. Defaults to `false`..
    * @param   {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
    * @param   {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
    * @throws  {TypeError}   Thrown if `text` is invalid.
    */
   constructor(
-    text,
+    key,
     extractable = false,
     textEncoder = new TextEncoder(),
     textDecoder = new TextDecoder()
   ) {
-    this.#keyPromise = createSymmetricKeyFromText(text, extractable, textEncoder)
+    this.#keyPromise = createSymmetricKeyFromText(key, extractable, textEncoder)
     this.#textEncoder = textEncoder
     this.#textDecoder = textDecoder
   }
@@ -188,8 +188,8 @@ export class SingleCryptText {
    * Encrypts a value.
    * 
    * @async
-   * @param   {string}          text          - String value to be encrypted.
-   * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
+   * @param   {string}          text      - String value to be encrypted.
+   * @param   {boolean}         [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
    * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
    * @throws  {DOMException}    Raised when:
    * - The provided key is not valid.
@@ -201,16 +201,16 @@ export class SingleCryptText {
 
   /**
    * @async
-   * @param   {string}          encryptedText - Encrypted value to be decrypted.
+   * @param   {string}          ciphertext - Encrypted value to be decrypted.
    * @returns {Promise<string>} The value decrypted.
-   * @throws  {TypeError}       Thrown if `encryptedText` is not a string.
-   * @throws  {SyntaxError}     Thrown if `encryptedText` contains characters outside Base64 alphabet.
+   * @throws  {TypeError}       Thrown if `ciphertext` is not a string.
+   * @throws  {SyntaxError}     Thrown if `ciphertext` contains characters outside Base64 alphabet.
    * @throws  {DOMException}    Raised when:
    * - The provided key is not valid.
    * - The operation failed.
    */
-  async decrypt(encryptedText) {
-    return await decryptTextSymmetrically(await this.getKey(), encryptedText, this.#textDecoder)
+  async decrypt(ciphertext) {
+    return await decryptTextSymmetrically(await this.getKey(), ciphertext, this.#textDecoder)
   }
 
 }
