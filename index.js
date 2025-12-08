@@ -1,3 +1,4 @@
+const base64UrlRegex = /-|_/
 const encryptionAlgorithm = "AES-GCM"
 const ivBytesLength = 12
 
@@ -87,9 +88,6 @@ export async function encryptTextSymmetrically(
   )
 
 }
-
-
-const base64UrlRegex = /-|_/
 
 
 /**
