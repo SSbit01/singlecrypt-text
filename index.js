@@ -1,4 +1,3 @@
-const base64UrlRegex = /-|_/
 const encryptionAlgorithm = "AES-GCM"
 const ivBytesLength = 12
 
@@ -111,9 +110,31 @@ export async function decryptTextSymmetrically(
   textDecoder = new TextDecoder()
 ) {
 
+  /**
+   * @type {(boolean|undefined)}
+   */
+  let urlSafe
+
+  let i = 0
+
+  do {
+    switch (ciphertext[i]) {
+      case "-":
+      case "_":
+        urlSafe = true
+        break
+      case "+":
+      case "/":
+        urlSafe = false
+        break
+      default:
+        i++
+    }
+  } while (urlSafe === undefined && i < ciphertext.length)
+
   const data = Uint8Array.fromBase64(
     ciphertext,
-    base64UrlRegex.test(ciphertext) ? base64UrlOptions : undefined
+    urlSafe ? base64UrlOptions : undefined
   )
   
   return (
