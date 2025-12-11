@@ -11,7 +11,7 @@ Object.freeze(keyUsages)
 /**
  * @type {Parameters<Uint8Array<ArrayBuffer>["toBase64"]>[0]} 
  */
-const base64UrlOptions = Object.freeze({
+const BASE64URL_OPTIONS = Object.freeze({
   alphabet: "base64url"
 })
 
@@ -73,7 +73,7 @@ export async function encryptTextSymmetrically(
   /**
    * @type {Parameters<Uint8Array["toBase64"]>[0]}
    */
-  const options = urlSafe ? base64UrlOptions : undefined
+  const options = urlSafe ? BASE64URL_OPTIONS : undefined
 
   return (
     iv.toBase64(options) +
@@ -134,7 +134,7 @@ export async function decryptTextSymmetrically(
 
   const data = Uint8Array.fromBase64(
     ciphertext,
-    urlSafe ? base64UrlOptions : undefined
+    urlSafe ? BASE64URL_OPTIONS : undefined
   )
   
   return (
