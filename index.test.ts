@@ -1,6 +1,5 @@
-import { expect, test } from "bun:test"
+import { describe, expect, test } from "bun:test"
 import SingleCryptText, { createSymmetricKeyFromText, encryptTextSymmetrically, decryptTextSymmetrically } from "."
-import { describe } from "node:test"
 
 
 function randomString(length = 32) {
