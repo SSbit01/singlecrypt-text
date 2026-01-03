@@ -15,7 +15,7 @@ describe("Functional", () => {
     expect(key).toBeDefined()
   })
   
-  test("Encrypt a random value", async() => {24 
+  test("Encrypt a random value", async() => {
     const key = await createSymmetricKeyFromText(randomString())
     expect(await encryptTextSymmetrically(key, randomString())).toBeString()
   })
