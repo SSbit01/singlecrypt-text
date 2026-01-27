@@ -2,9 +2,8 @@ import { describe, expect, test } from "bun:test"
 import SingleCryptText, { createSymmetricKeyFromText, encryptTextSymmetrically, decryptTextSymmetrically } from "."
 
 
-function randomString(length = 32) {
-  // A Base64 character is 6 bits: 6 bits / 8 bits = 0.75
-  return crypto.getRandomValues(new Uint8Array(length * .75)).toBase64()
+function randomString() {
+  return crypto.getRandomValues(new Uint8Array(24)).toBase64()
 }
 
 
