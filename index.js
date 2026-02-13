@@ -22,11 +22,11 @@ const BASE64URL_OPTIONS = Object.freeze({
  * 
  * @async
  * @function createSymmetricKeyFromText
- * @param   {string}             key           - Text key to be hashed. A 32-byte high entropy string is recommended.
- * @param   {boolean}            [extractable] - Whether the generated key is extractable. Defaults to `false`..
- * @param   {TextEncoder}        [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
+ * @param {string} key - Text key to be hashed. A 32-byte high entropy string is recommended.
+ * @param {boolean} [extractable] - Whether the generated key is extractable. Defaults to `false`..
+ * @param {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
  * @returns {Promise<CryptoKey>} A `CryptoKey` containing a SHA-256 hash used to encrypt and decrypt strings.
- * @throws  {TypeError}          Thrown if `text` is invalid.
+ * @throws {TypeError} Thrown if `text` is invalid.
  */
 export async function createSymmetricKeyFromText(
   key,
@@ -52,12 +52,13 @@ export async function createSymmetricKeyFromText(
  * 
  * @async
  * @function encryptTextSymmetrically
- * @param   {CryptoKey}       key           - Symmetric key generated with `createSymmetricKeyFromText`.
- * @param   {string}          text          - String value to be encrypted.
- * @param   {boolean}         [urlSafe]     - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
- * @param   {TextEncoder}     [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
+ * @param {CryptoKey} key - Symmetric key generated with `createSymmetricKeyFromText`.
+ * @param {string} text - String value to be encrypted.
+ * @param {boolean} [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
+ * @param {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
+ * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
  * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
- * @throws  {DOMException}    Raised when:
+ * @throws {DOMException} Raised when:
  * - The provided key is not valid.
  * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
  */
@@ -65,7 +66,8 @@ export async function encryptTextSymmetrically(
   key,
   text,
   urlSafe = true,
-  textEncoder = new TextEncoder()
+  textEncoder = new TextEncoder(),
+  additionalData
 ) {
 
   const iv = crypto.getRandomValues(new Uint8Array(ivBytesLength))
@@ -79,7 +81,7 @@ export async function encryptTextSymmetrically(
     iv.toBase64(options) +
     new Uint8Array(
       await crypto.subtle.encrypt(
-        { name: encryptionAlgorithm, iv },
+        { name: encryptionAlgorithm, iv, additionalData },
         key,
         textEncoder.encode(text)
       )
@@ -94,20 +96,22 @@ export async function encryptTextSymmetrically(
  * 
  * @async
  * @function decryptTextSymmetrically
- * @param   {CryptoKey}       key           - Symmetric key used to encrypt the value.
- * @param   {string}          ciphertext    - Encrypted value to be decrypted.
- * @param   {TextDecoder}     [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
+ * @param {CryptoKey} key - Symmetric key used to encrypt the value.
+ * @param {string} ciphertext - Encrypted value to be decrypted.
+ * @param {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
+ * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
  * @returns {Promise<string>} The value decrypted.
- * @throws  {TypeError}       Thrown if `ciphertext` is not a string.
- * @throws  {SyntaxError}     Thrown if `ciphertext` contains characters outside Base64 alphabet.
- * @throws  {DOMException}    Raised when:
+ * @throws {TypeError} Thrown if `ciphertext` is not a string.
+ * @throws {SyntaxError} Thrown if `ciphertext` contains characters outside Base64 alphabet.
+ * @throws {DOMException} Raised when:
  * - The provided key is not valid.
  * - The operation failed.
  */
 export async function decryptTextSymmetrically(
   key,
   ciphertext,
-  textDecoder = new TextDecoder()
+  textDecoder = new TextDecoder(),
+  additionalData
 ) {
 
   /**
@@ -140,7 +144,7 @@ export async function decryptTextSymmetrically(
   return (
     textDecoder.decode(
       await crypto.subtle.decrypt(
-        { name: encryptionAlgorithm, iv: data.subarray(0, ivBytesLength) },
+        { name: encryptionAlgorithm, iv: data.subarray(0, ivBytesLength), additionalData },
         key,
         data.subarray(ivBytesLength)
       )
@@ -172,11 +176,11 @@ export class SingleCryptText {
   /**
    * Create an instance using a text as a key.
    * 
-   * @param   {string}      key           - Text key to be hashed. A 32-byte high entropy string is recommended.
-   * @param   {boolean}     [extractable] - Whether the generated key is extractable. Defaults to `false`..
-   * @param   {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
-   * @param   {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
-   * @throws  {TypeError}   Thrown if `text` is invalid.
+   * @param {string} key - Text key to be hashed. A 32-byte high entropy string is recommended.
+   * @param {boolean} [extractable] - Whether the generated key is extractable. Defaults to `false`..
+   * @param {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
+   * @param {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
+   * @throws {TypeError} Thrown if `key` is invalid.
    */
   constructor(
     key,
@@ -204,32 +208,43 @@ export class SingleCryptText {
   }
 
   /**
-   * Encrypts a value.
-   * 
    * @async
-   * @param   {string}          text      - String value to be encrypted.
-   * @param   {boolean}         [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
+   * @param {string} text - String value to be encrypted.
+   * @param {boolean} [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
+   * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
    * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
-   * @throws  {DOMException}    Raised when:
+   * @throws {DOMException} Raised when:
    * - The provided key is not valid.
    * - The operation failed (e.g., AES-GCM plaintext longer than 2^39−256 bytes).
    */
-  async encrypt(text, urlSafe = true) {
-    return await encryptTextSymmetrically(await this.getKey(), text, urlSafe, this.#textEncoder)
+  async encrypt(text, urlSafe = true, additionalData) {
+    return await encryptTextSymmetrically(
+      await this.getKey(),
+      text,
+      urlSafe,
+      this.#textEncoder,
+      additionalData
+    )
   }
 
   /**
    * @async
-   * @param   {string}          ciphertext - Encrypted value to be decrypted.
+   * @param {string} ciphertext - Encrypted value to be decrypted.
+   * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
    * @returns {Promise<string>} The value decrypted.
-   * @throws  {TypeError}       Thrown if `ciphertext` is not a string.
-   * @throws  {SyntaxError}     Thrown if `ciphertext` contains characters outside Base64 alphabet.
-   * @throws  {DOMException}    Raised when:
+   * @throws {TypeError} Thrown if `ciphertext` is not a string.
+   * @throws {SyntaxError} Thrown if `ciphertext` contains characters outside Base64 alphabet.
+   * @throws {DOMException} Raised when:
    * - The provided key is not valid.
    * - The operation failed.
    */
-  async decrypt(ciphertext) {
-    return await decryptTextSymmetrically(await this.getKey(), ciphertext, this.#textDecoder)
+  async decrypt(ciphertext, additionalData) {
+    return await decryptTextSymmetrically(
+      await this.getKey(),
+      ciphertext,
+      this.#textDecoder,
+      additionalData
+    )
   }
 
 }
