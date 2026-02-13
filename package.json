@@ -47,8 +47,7 @@
     "test:random": "bun test --randomize",
     "build": "bun build ./index.js --minify --target browser --outdir ./dist --entry-naming [dir]/[name].min.[ext]",
     "build:cjs": "bun build ./index.js --minify --format cjs --outdir ./dist --entry-naming [dir]/[name].node.min.[ext]",
-    "build:types": "tsc",
-    "docs": "typedoc"
+    "build:types": "tsc"
   },
   "type": "module",
   "types": "index.d.ts",
