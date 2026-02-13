@@ -56,7 +56,7 @@ export async function createSymmetricKeyFromText(
  * @param {string} text - String value to be encrypted.
  * @param {boolean} [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
  * @param {TextEncoder} [textEncoder] - If you have an instance of a `TextEncoder`, you can reuse it.
- * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
+ * @param {BufferSource} [additionalData] - Additional data for authentication.
  * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
  * @throws {DOMException} Raised when:
  * - The provided key is not valid.
@@ -99,7 +99,7 @@ export async function encryptTextSymmetrically(
  * @param {CryptoKey} key - Symmetric key used to encrypt the value.
  * @param {string} ciphertext - Encrypted value to be decrypted.
  * @param {TextDecoder} [textDecoder] - If you have an instance of a `TextDecoder`, you can reuse it.
- * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
+ * @param {BufferSource} [additionalData] - Additional data for authentication.
  * @returns {Promise<string>} The value decrypted.
  * @throws {TypeError} Thrown if `ciphertext` is not a string.
  * @throws {SyntaxError} Thrown if `ciphertext` contains characters outside Base64 alphabet.
@@ -211,7 +211,7 @@ export class SingleCryptText {
    * @async
    * @param {string} text - String value to be encrypted.
    * @param {boolean} [urlSafe] - The encrypted values default to `base64` alphabet; this property enables the `base64url` alphabet. Enabled by default.
-   * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
+   * @param {BufferSource} [additionalData] - Additional data for authentication.
    * @returns {Promise<string>} The value encrypted and encoded as a Base64 string.
    * @throws {DOMException} Raised when:
    * - The provided key is not valid.
@@ -230,7 +230,7 @@ export class SingleCryptText {
   /**
    * @async
    * @param {string} ciphertext - Encrypted value to be decrypted.
-   * @param {BufferSource} [additionalData] - Additional data to be included in the encryption process (authentication tag).
+   * @param {BufferSource} [additionalData] - Additional data for authentication.
    * @returns {Promise<string>} The value decrypted.
    * @throws {TypeError} Thrown if `ciphertext` is not a string.
    * @throws {SyntaxError} Thrown if `ciphertext` contains characters outside Base64 alphabet.

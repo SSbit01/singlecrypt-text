@@ -1,13 +1,24 @@
 # SingleCrypt Text
 
 > [!WARNING]  
-> This package uses [`Uint8Array.prototype.toBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64) and [`Uint8Array.fromBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64), which, as of November 2025, are only supported by the latest versions of browsers, [Bun](https://bun.com/), [Deno 2.5 or later](https://deno.com/) and [Node.js 25 or later](https://nodejs.org/en). See [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility) for compatibility.
+> This package uses
+> [`Uint8Array.prototype.toBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64)
+> and [`Uint8Array.fromBase64()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/fromBase64),
+> which, as of November 2025, are only supported by the latest versions of browsers, [Bun](https://bun.com/),
+> [Deno 2.5 or later](https://deno.com/) and [Node.js 25 or later](https://nodejs.org/en).
+> See [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array/toBase64#browser_compatibility)
+> for compatibility.
 
-A simple, secure, and fast symmetric encryption library that makes use of [AES-GCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) and modern platform features. It leverages the native [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API), so it works both in browsers (in secure contexts) and JavaScript runtimes.
+A simple, secure, and fast symmetric encryption library that makes use of
+[AES-GCM](https://en.wikipedia.org/wiki/Galois/Counter_Mode) and modern platform features.
+It leverages the native [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API),
+so it works both in browsers (in secure contexts) and JavaScript runtimes.
 
 ## Why AES-GCM?
 
-AES-GCM is extremely fast on modern CPUs, which have dedicated hardware acceleration ([AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set)), in addition to being highly secure and even quantum-resistant (AES-256-GCM).
+AES-GCM is extremely fast on modern CPUs,
+which have dedicated hardware acceleration ([AES-NI](https://en.wikipedia.org/wiki/AES_instruction_set)),
+in addition to being highly secure and even quantum-resistant (AES-256-GCM).
 
 ## Installation
 
@@ -179,11 +190,11 @@ new SingleCryptText(
 
 #### Instance methods
 
-- `async encrypt(text: string, urlSafe?: boolean): Promise<string>`
+- `async encrypt(text: string, urlSafe?: boolean, additionalData?: BufferSource): Promise<string>`
   
   Encrypt a string using the instance's key. Optionally specify `urlSafe` (`true` by default) to use `base64url` encoding.
 
-- `async decrypt(ciphertext: string): Promise<string>`
+- `async decrypt(ciphertext: string, additionalData?: BufferSource): Promise<string>`
   
   Decrypt a string previously encrypted by this or any compatible instance.
 
@@ -233,13 +244,15 @@ encryptTextSymmetrically(
   key: CryptoKey,
   text: string,
   urlSafe?: boolean,
-  textEncoder?: TextEncoder
+  textEncoder?: TextEncoder,
+  additionalData?: BufferSource
 ): Promise<string>
 ```
 - `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
 - `text`: String value to encrypt.
 - `urlSafe` (optional): Use `base64url` encoding if `true` (default: `true`). If `false`, uses regular `base64`.
 - `textEncoder` (optional): Optionally reuse your own `TextEncoder` instance.
+- `additionalData` (optional): Additional data for authentication. Defaults to `undefined`.
 
 Returns a `Promise<string>` containing the encrypted value as a Base64 string.
 
@@ -252,13 +265,15 @@ Returns a `Promise<string>` containing the encrypted value as a Base64 string.
 decryptTextSymmetrically(
   key: CryptoKey,
   ciphertext: string,
-  textDecoder?: TextDecoder
+  textDecoder?: TextDecoder,
+  additionalData?: BufferSource
 ): Promise<string>
 ```
 
 - `key`: A symmetric key previously generated with `createSymmetricKeyFromText`.
 - `ciphertext`: The string value to decrypt (encrypted with compatible methods/settings).
 - `textDecoder` (optional): Optionally reuse your own `TextDecoder` instance.
+- `additionalData` (optional): Additional data for authentication. Defaults to `undefined`.
 
 Returns a `Promise<string>` containing the decrypted value.
 

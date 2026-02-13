@@ -1,6 +1,6 @@
 {
   "name": "singlecrypt-text",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "author": "Stefan Samson <ss42701@outlook.com> (https://ssbit01.github.io/)",
   "repository": "github:SSbit01/singlecrypt-text",
   "main": "index.js",
@@ -47,7 +47,8 @@
     "test:random": "bun test --randomize",
     "build": "bun build ./index.js --minify --target browser --outdir ./dist --entry-naming [dir]/[name].min.[ext]",
     "build:cjs": "bun build ./index.js --minify --format cjs --outdir ./dist --entry-naming [dir]/[name].node.min.[ext]",
-    "build:types": "tsc"
+    "build:types": "tsc",
+    "docs": "typedoc"
   },
   "type": "module",
   "types": "index.d.ts",
